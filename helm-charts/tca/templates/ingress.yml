@@ -8,8 +8,10 @@ metadata:
     app: {{ template "tca.name" . }}
     chart: {{ template "tca.chart" . }}
     release: {{ .Release.Name }}
+  {{- if .Values.ingress.annotations }}
+  annotations: {{- toYaml .Values.ingress.annotations | nindent 4 }}
+  {{- end }}
 spec:
-  ingressClassName: nginx
   rules:
     - host: {{ .Values.tca.commonConfig.publicUrl }}
       http:

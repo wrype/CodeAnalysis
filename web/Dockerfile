@@ -1,3 +1,11 @@
+FROM node:18-alpine
+
+RUN apk update && apk add --no-cache git zip jq bash
+RUN yarn config set registry https://registry.npmmirror.com
+COPY . /tca/
+RUN cd /tca/web \
+    && bash build-source.sh
+
 FROM nginx:1.13.7
 
 ARG EXTRA_TOOLS="unzip procps"
@@ -13,7 +21,7 @@ RUN set -ex && apt-get update \
     && apt-get clean \
     && rm -rf /var/cache/apt/* /root/.cache
 
-COPY tca-deploy-source /data/tca-deploy-source
+COPY --from=0 /tca/web/tca-deploy-source /data/tca-deploy-source
 
 WORKDIR /data/tca-deploy-source/
 

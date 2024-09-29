@@ -18,3 +18,38 @@ tca:
 
   commonConfig:
     publicUrl: "tca.devops.intltest11.com"
+
+  web:
+    service:
+      type: ClusterIP
+  main:
+    server:
+      service:
+        type: ClusterIP
+  analysis:
+    server:
+      service:
+        type: ClusterIP
+  login:
+    server:
+      service:
+        type: ClusterIP
+  file:
+    server:
+      service:
+        type: ClusterIP
+    settings:
+      storageClient: "cos"
+      tencentcos:
+        enabled: "true"
+        appId: "xxx"
+        secretId: "xxx"
+        secretKey: "xxx"
+        region: "xxx"
+        rootBucket: "xxx"
+  scmproxy:
+    service:
+      type: ClusterIP
+  gateway:
+    service:
+      type: ClusterIP

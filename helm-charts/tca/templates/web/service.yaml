@@ -9,19 +9,27 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 spec:
-  type: NodePort
+  type: {{ .Values.tca.web.service.type }}
   ports:
   - name: http
     port: {{ .Values.tca.web.service.ports.http }}
     protocol: TCP
     targetPort: http
+    {{- if (and (or (eq .Values.tca.web.service.type "NodePort") (eq .Values.tca.web.service.type "LoadBalancer")) (not (empty .Values.tca.web.service.nodePorts.http))) }}
     nodePort: {{ .Values.tca.web.service.nodePorts.http }}
+    {{- else if eq .Values.tca.web.service.type "ClusterIP" }}
+    nodePort: null
+    {{- end }}
   {{- if .Values.tca.web.service.ports.https }}
   - name: https
     port: {{ .Values.tca.web.service.ports.https }}
     protocol: TCP
     targetPort: {{ .Values.tca.web.service.httpsTargetPort }}
+    {{- if (and (or (eq .Values.tca.web.service.type "NodePort") (eq .Values.tca.web.service.type "LoadBalancer")) (not (empty .Values.tca.web.service.nodePorts.http))) }}
     nodePort: {{ .Values.tca.web.service.nodePorts.https }}
+    {{- else if eq .Values.tca.web.service.type "ClusterIP" }}
+    nodePort: null
+    {{- end }}
   {{- end }}
   selector:
     k8s-app: {{ template "tca.fullname" . }}-web

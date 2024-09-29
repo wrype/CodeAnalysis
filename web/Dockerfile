@@ -1,6 +1,6 @@
 FROM node:16-alpine
 
-RUN apk update && apk add --no-cache git zip jq bash
+RUN apk update && apk add --no-cache git zip jq bash python3
 RUN yarn config set registry https://registry.npmmirror.com
 COPY scripts /tca/scripts
 COPY doc /tca/doc

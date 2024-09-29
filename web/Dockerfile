@@ -1,11 +1,16 @@
-FROM node:18-alpine
+FROM node:16-alpine
 
 RUN apk update && apk add --no-cache git zip jq bash
 RUN yarn config set registry https://registry.npmmirror.com
-COPY . /tca/
-RUN cd /tca/scripts/base/ \
-    && bash install_bin.sh \
-    && cd /tca/web \
+COPY scripts /tca/scripts
+COPY doc /tca/doc
+RUN cd /tca/ \
+    && bash ./scripts/base/install_bin.sh \
+    && mv tca/tca_lib/doc/* /tca/doc/
+
+COPY .git /tca/.git
+COPY web /tca/web
+RUN cd /tca/web \
     && bash build-source.sh
 
 FROM nginx:1.13.7

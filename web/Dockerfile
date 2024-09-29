@@ -3,7 +3,9 @@ FROM node:18-alpine
 RUN apk update && apk add --no-cache git zip jq bash
 RUN yarn config set registry https://registry.npmmirror.com
 COPY . /tca/
-RUN cd /tca/web \
+RUN cd /tca/scripts/base/ \
+    && bash install_bin.sh \
+    && cd /tca/web \
     && bash build-source.sh
 
 FROM nginx:1.13.7

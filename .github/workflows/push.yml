@@ -13,30 +13,30 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - dockerfile: ./server/projects/main/Dockerfile
-            context: ./server/projects/main/
-            image: tca-main
-          - dockerfile: ./server/projects/analysis/Dockerfile
-            context: ./server/projects/analysis/
-            image: tca-analysis
-          - dockerfile: ./server/projects/login/Dockerfile
-            context: ./server/projects/login/
-            image: tca-login
-          - dockerfile: ./server/projects/file/Dockerfile
-            context: ./server/projects/file/
-            image: tca-file
-          - dockerfile: ./server/projects/scmproxy/Dockerfile
-            context: ./server/projects/scmproxy/
-            image: tca-scmproxy
+          # - dockerfile: ./server/projects/main/Dockerfile
+          #   context: ./server/projects/main/
+          #   image: tca-main
+          # - dockerfile: ./server/projects/analysis/Dockerfile
+          #   context: ./server/projects/analysis/
+          #   image: tca-analysis
+          # - dockerfile: ./server/projects/login/Dockerfile
+          #   context: ./server/projects/login/
+          #   image: tca-login
+          # - dockerfile: ./server/projects/file/Dockerfile
+          #   context: ./server/projects/file/
+          #   image: tca-file
+          # - dockerfile: ./server/projects/scmproxy/Dockerfile
+          #   context: ./server/projects/scmproxy/
+          #   image: tca-scmproxy
           - dockerfile: ./web/Dockerfile
             context: .
             image: tca-web
-          - dockerfile: ./client/Dockerfile
-            context: ./client/
-            image: tca-client
-          - dockerfile: ./Dockerfile
-            context: .
-            image: tca
+          # - dockerfile: ./client/Dockerfile
+          #   context: ./client/
+          #   image: tca-client
+          # - dockerfile: ./Dockerfile
+          #   context: .
+          #   image: tca
 
     steps:
     # 1. 检出

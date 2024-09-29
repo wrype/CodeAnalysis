@@ -4,9 +4,9 @@ RUN apk update && apk add --no-cache git zip jq bash
 RUN yarn config set registry https://registry.npmmirror.com
 COPY scripts /tca/scripts
 COPY doc /tca/doc
-RUN cd /tca/ \
-    && bash ./scripts/base/install_bin.sh \
-    && mv tca/tca_lib/doc/* /tca/doc/
+# RUN cd /tca/ \
+#     && bash ./scripts/base/install_bin.sh \
+#     && mv tca/tca_lib/doc/* /tca/doc/
 
 COPY .git /tca/.git
 COPY web /tca/web

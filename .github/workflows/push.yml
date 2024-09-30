@@ -29,7 +29,7 @@ jobs:
             context: ./server/projects/scmproxy/
             image: tca-scmproxy
           - dockerfile: ./web/Dockerfile
-            context: ./web/
+            context: .
             image: tca-web
           - dockerfile: ./client/Dockerfile
             context: ./client/

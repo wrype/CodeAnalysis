@@ -17,27 +17,46 @@ tca:
     enable: true
 
   commonConfig:
-    publicUrl: "tca.devops.intltest11.com"
+    publicUrl: "xxx"
 
   web:
+    image:
+      repository: wrype/tca-web
+      tag: 97cd34581f
     service:
-      type: ClusterIP
+      type: NodePort
+
   main:
+    image:
+      repository: wrype/tca-main
+      tag: 4bcc29a1d2
     server:
       service:
-        type: ClusterIP
+        type: NodePort
+
   analysis:
+    image:
+      repository: wrype/tca-analysis
+      tag: 4bcc29a1d2
     server:
       service:
-        type: ClusterIP
+        type: NodePort
+
   login:
+    image:
+      repository: wrype/tca-login
+      tag: 4bcc29a1d2
     server:
       service:
-        type: ClusterIP
+        type: NodePort
+
   file:
+    image:
+      repository: wrype/tca-file
+      tag: 4bcc29a1d2
     server:
       service:
-        type: ClusterIP
+        type: NodePort
     settings:
       storageClient: "cos"
       tencentcos:
@@ -47,9 +66,19 @@ tca:
         secretKey: "xxx"
         region: "xxx"
         rootBucket: "xxx"
+
   scmproxy:
+    image:
+      repository: wrype/tca-scmproxy
+      tag: 4bcc29a1d2
     service:
-      type: ClusterIP
+      type: NodePort
+
+  client:
+    image:
+      repository: wrype/tca-client
+      tag: 4bcc29a1d2
+
   gateway:
     service:
-      type: ClusterIP
+      type: NodePort

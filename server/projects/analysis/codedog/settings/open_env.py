@@ -10,11 +10,11 @@
 环境: 开源环境通用配置
 """
 import os
-import sentry_sdk
-from sentry_sdk.integrations.django import DjangoIntegration
-from sentry_sdk.integrations.celery import CeleryIntegration
 
+import sentry_sdk
 from codedog.settings.open_base import *
+from sentry_sdk.integrations.celery import CeleryIntegration
+from sentry_sdk.integrations.django import DjangoIntegration
 
 # -*-*-*-*-*-*-*-*-*-*--*-*-*-*-*-*-*-*-*-*--*-*-*-*-*-*-*-*-*-*-
 # -*-*-*-*-*-*-*-*-*-*-*-     工程配置     -*-*-*-*-*-*-*-*-*-*-*-
@@ -31,6 +31,9 @@ ADMINS = []
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get("ANALYSIS_SECRET_KEY", "25n=e*_e=4q!ert$4u#9v&^2n+)_#mi7&7ll@x29@j=w=k^q@^")
 
+# 设置默认主键类型，适配django3.2
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
 # 数据库配置，可参考django数据库配置
 DATABASES = {
     "default": {
@@ -40,7 +43,7 @@ DATABASES = {
         "PASSWORD": os.environ.get("ANALYSIS_DB_PASSWORD"),
         "HOST": os.environ.get("ANALYSIS_DB_HOST"),
         "PORT": os.environ.get("ANALYSIS_DB_PORT"),
-        "OPTIONS": {"charset": "utf8mb4"},
+        # "OPTIONS": {"charset": "utf8mb4"},
     }
 }
 
@@ -76,10 +79,11 @@ API_TICKET_TOKEN = os.environ.get("API_TICKET_TOKEN")
 LOCAL_DOMAIN = os.environ.get("LOCAL_DOMAIN", "")
 
 # Main Server 接口
-MAIN_SERVER_URL = os.environ.get("MAIN_SERVER_URL")
+MAIN_SERVER_URL = os.environ.get("MAIN_SERVER_URL", "http://127.0.0.1:8001")
 
 # 文件服务器
 FILE_SERVER = {
-    "URL": os.environ.get("FILE_SERVER_URL"),
+    "URL": os.environ.get("FILE_SERVER_URL", "http://127.0.0.1:8000/files/"),
+    # "TOKEN": os.environ.get("FILE_SERVER_TOKEN"),
     "TYPE_PREFIX": os.environ.get("FILE_SERVER_TYPE", "public")
 }

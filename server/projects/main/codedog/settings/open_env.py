@@ -10,11 +10,11 @@
 环境: 开源环境通用配置
 """
 import os
-import sentry_sdk
-from sentry_sdk.integrations.django import DjangoIntegration
-from sentry_sdk.integrations.celery import CeleryIntegration
 
+import sentry_sdk
 from codedog.settings.open_base import *
+from sentry_sdk.integrations.celery import CeleryIntegration
+from sentry_sdk.integrations.django import DjangoIntegration
 
 # -*-*-*-*-*-*-*-*-*-*--*-*-*-*-*-*-*-*-*-*--*-*-*-*-*-*-*-*-*-*-
 # -*-*-*-*-*-*-*-*-*-*-*-     工程配置     -*-*-*-*-*-*-*-*-*-*-*-
@@ -30,6 +30,9 @@ ADMINS = []
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get("MAIN_SECRET_KEY", "lh+6y8pyf16bbor*)p=kp=p(cg615+y+5nnin$l(n%os$8z^v%")
 
+# 设置默认主键类型，适配django3.2
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
 # 数据库配置，可参考django数据库配置
 DATABASES = {
     "default": {
@@ -39,7 +42,7 @@ DATABASES = {
         "PASSWORD": os.environ.get("MAIN_DB_PASSWORD"),
         "HOST": os.environ.get("MAIN_DB_HOST"),
         "PORT": os.environ.get("MAIN_DB_PORT"),
-        "OPTIONS": {"charset": "utf8mb4"},
+        # "OPTIONS": {"charset": "utf8mb4"},
     }
 }
 
@@ -87,25 +90,27 @@ LOCAL_DOMAIN = os.environ.get("LOCAL_DOMAIN", "")
 CODEDOG_TOKEN = os.environ.get("CODEDOG_TOKEN")
 
 # Web Server, 用于本地扫描
-WEB_SERVER_URL = os.environ.get("WEB_SERVER_URL")
+WEB_SERVER_URL = os.environ.get("WEB_SERVER_URL", "http://127.0.0.1")
 # Main server，用于本地扫描
-MAIN_SERVER_URL = os.environ.get("MAIN_SERVER_URL")
+MAIN_SERVER_URL = os.environ.get("MAIN_SERVER_URL", "http://127.0.0.1:8001")
 # Analyse Server 接口
-ANALYSE_SERVER_URL = os.environ.get("ANALYSE_SERVER_URL")
+ANALYSE_SERVER_URL = os.environ.get("ANALYSE_SERVER_URL", "http://127.0.0.1:8002")
 # Login服务地址
-LOGIN_SERVER_URL = os.environ.get("LOGIN_SERVER_URL")
+LOGIN_SERVER_URL = os.environ.get("LOGIN_SERVER_URL", "http://127.0.0.1:8003")
 # Scmproxy服务地址
-SCMPROXY = os.environ.get("SCMPROXY")
+SCMPROXY = os.environ.get("SCMPROXY", "http://127.0.0.1:8009")
 SCMPROXY_TIMEOUT = os.environ.get("SCMPROXY_TIMEOUT", 300)
 
 # 文件服务器
 FILE_SERVER = {
-    "URL": os.environ.get("FILE_SERVER_URL"),
+    "URL": os.environ.get("FILE_SERVER_URL", "http://127.0.0.1:8000/files/"),
+    # "TOKEN": os.environ.get("FILE_SERVER_TOKEN"),
     "TYPE_PREFIX": os.environ.get("FILE_SERVER_TYPE", "public")
 }
 
-# 登录鉴权默认公钥
-DEFAULT_PUBKEY = """-----BEGIN PUBLIC KEY-----
+# 登录鉴权公钥
+# Notice：默认的公钥仅测试用途，如在正式环境部署请重新生成
+AUTHORIZATION_PUBKEY = """-----BEGIN PUBLIC KEY-----
 MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDtuJtwo+ZkqAA7ZKNdzcQM1N+r
 anRqpNE+R4MKfzCa4uKURK9z7cG6DQT6ihpdSYw36iaMIRMYUM7SsismpYYe68q3
 98nXivMpCDOeO3VC91Y8DU/9058smPswwr6kYFU/TZIDAUqb+H6T5DSbKnl7WZqx

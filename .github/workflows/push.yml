@@ -25,18 +25,18 @@ jobs:
           - dockerfile: ./server/projects/file/Dockerfile
             context: ./server/projects/file/
             image: tca-file
-          - dockerfile: ./server/projects/scmproxy/Dockerfile
-            context: ./server/projects/scmproxy/
-            image: tca-scmproxy
-          - dockerfile: ./web/Dockerfile
-            context: .
-            image: tca-web
-          - dockerfile: ./client/Dockerfile
-            context: ./client/
-            image: tca-client
-          - dockerfile: ./Dockerfile
-            context: .
-            image: tca
+          # - dockerfile: ./server/projects/scmproxy/Dockerfile
+          #   context: ./server/projects/scmproxy/
+          #   image: tca-scmproxy
+          # - dockerfile: ./web/Dockerfile
+          #   context: .
+          #   image: tca-web
+          # - dockerfile: ./client/Dockerfile
+          #   context: ./client/
+          #   image: tca-client
+          # - dockerfile: ./Dockerfile
+          #   context: .
+          #   image: tca
 
     steps:
     # 1. 检出

@@ -27,7 +27,7 @@ DATABASES = {
         "PASSWORD": os.environ.get("LOGIN_DB_PASSWORD"),
         "HOST": os.environ.get("LOGIN_DB_HOST"),
         "PORT": os.environ.get("LOGIN_DB_PORT"),
-        "OPTIONS": {"charset": "utf8mb4"}
+        # "OPTIONS": {"charset": "utf8mb4"}
     }
 }
 

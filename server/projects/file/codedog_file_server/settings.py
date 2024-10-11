@@ -34,10 +34,10 @@ sys.path.insert(0, os.path.join(PROJECT_PATH, "utils"))
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "@z1!4&x+6f&gu#9#e(y4_m@c2r(3*8l0^s9aie24pe^a*xx8*("
+SECRET_KEY = os.environ.get("FILE_SECRET_KEY", "4uf)0sfdth1bn7t450_6)_^+pcx4qa8_nw5l1!g3gp%0loq5p^")
 
 # SECURITY WARNING: don"t run with debug turned on in production!
-DEBUG = True
+DEBUG = True if os.environ.get("FILE_DEBUG_MODE") == "true" else False
 
 ALLOWED_HOSTS = ["*"]
 
@@ -101,7 +101,7 @@ DATABASES = {
         "PASSWORD": os.environ.get("FILE_DB_PASSWORD"),
         "HOST": os.environ.get("FILE_DB_HOST"),
         "PORT": os.environ.get("FILE_DB_PORT"),
-        "OPTIONS": {"charset":"utf8mb4"},
+        # "OPTIONS": {"charset":"utf8mb4"},
     },
 }
 
@@ -212,11 +212,25 @@ REST_FRAMEWORK = {
 # ==============================================
 # 本地存储
 STORAGE = {
-    "CLIENT": os.environ.get("FILE_STORAGE_CLIENT", "utils.file_storage.LocalFilesystemStorageClient"),  # 存储方式
+    "CLIENT": os.environ.get("FILE_STORAGE_CLIENT", "LOCAL").upper(),  # 存储方式
     "OPTIONS": {
         # 本地存储根目录
-        "DEFAULT_STORAGE_ROOT_DIR": os.environ.get("FILE_STORAGE_DIR", "data/"),
-    }
+        "DEFAULT_STORAGE_ROOT_DIR": os.environ.get("FILE_STORAGE_DIR", "data/ftp/"),
+        # cos桶配置
+        "TENCENT_COS_APPID": os.environ.get("TENCENT_COS_APPID", ""),
+        "TENCENT_COS_SECRETID": os.environ.get("TENCENT_COS_SECRETID", ""),
+        "TENCENT_COS_SECRETKEY": os.environ.get("TENCENT_COS_SECRETKEY", ""),
+        "TENCENT_COS_REGION": os.environ.get("TENCENT_COS_REGION", ""),
+        "TENCENT_COS_ROOT_BUCKET": os.environ.get(
+            "TENCENT_COS_ROOT_BUCKET", "bucket-appid"
+        ),
+        # minio桶配置
+        "MINIO_ENTRYPOINT": os.environ.get(
+            "FILE_MINIO_ENTRYPOINT"
+        ),  # MinIO平台地址（API地址，非Console地址）
+        "MINIO_ACCESS_KEY": os.environ.get("FILE_MINIO_ACCESS_KEY"),  # MinIO登录账号
+        "MINIO_SECRET_KEY": os.environ.get("FILE_MINIO_SECRET_KEY"),  # MinIO登录密码
+    },
 }
 
 # ==============================================
@@ -232,10 +246,13 @@ if REDIS_PASSWD:
 else:
     CELERY_BROKER_URL = "redis://%s:%s/%s" % (REDIS_HOST, REDIS_PORT, REDIS_DBID)
 
+# 服务域名
+SITE_URL = os.environ.get("FILE_SITE_URL")
+
 # ==============================================
 # Sentry 数据上报地址
 # ==============================================
-SENTRY_DSN = os.environ.get("SENTRY_DSN")
+SENTRY_DSN = os.environ.get("FILE_SENTRY_DSN")
 
 if not DEBUG:
     sentry_sdk.init(

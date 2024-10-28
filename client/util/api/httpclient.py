@@ -19,7 +19,7 @@ from urllib.request import Request, urlopen
 from util.wrapper import Retry, SyncWrapper
 
 logger = logging.getLogger(__name__)
-http.client.HTTPConnection.set_debuglevel(1)
+http.client.HTTPConnection.debuglevel = 1
 
 class HttpRequest(object):
     @staticmethod

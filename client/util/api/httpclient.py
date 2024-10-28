@@ -8,18 +8,18 @@
 """ http client
 """
 
-import ssl
+import http.client
 import json
 import logging
-
-from urllib.parse import urljoin
-from util.wrapper import SyncWrapper, Retry
-from urllib.request import Request, urlopen
+import ssl
 from urllib.error import HTTPError
+from urllib.parse import urljoin
+from urllib.request import Request, urlopen
 
+from util.wrapper import Retry, SyncWrapper
 
 logger = logging.getLogger(__name__)
-
+http.client.HTTPConnection.set_debuglevel(1)
 
 class HttpRequest(object):
     @staticmethod
@@ -42,6 +42,7 @@ class HttpRequest(object):
             request = Request(url=url, data=body, headers=headers)
             request.get_method = lambda: method.upper()
             response = urlopen(request, context=ssl._create_unverified_context())
+            logger.info(f"wpdbg: {response.request}")
             return response
         except HTTPError as err:
             error_msg = err.read().decode('utf-8')

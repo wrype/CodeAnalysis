@@ -12,6 +12,7 @@ import http.client
 import json
 import logging
 import ssl
+from io import BytesIO
 from urllib.error import HTTPError
 from urllib.parse import urljoin
 from urllib.request import Request, urlopen
@@ -19,6 +20,7 @@ from urllib.request import Request, urlopen
 from util.wrapper import Retry, SyncWrapper
 
 logger = logging.getLogger(__name__)
+http.client.HTTPConnection.debuglevel = 1
 
 class HttpRequest(object):
     @staticmethod
@@ -41,10 +43,12 @@ class HttpRequest(object):
             request = Request(url=url, data=body, headers=headers)
             request.get_method = lambda: method.upper()
             response = urlopen(request, context=ssl._create_unverified_context())
+            buffer = BytesIO(response.read())
             logger.info(
-                f"wpdbg: {request.get_method()} {url} header: {request.headers} req.data: {request.data} resp: {response.read().decode('utf8')}"
+                f"wpdbg: {request.get_method()} {url} header: {request.headers} req.data: {request.data} resp: {buffer.read().decode('utf8')}"
             )
-            return response
+            buffer.seek(0)
+            return buffer
         except HTTPError as err:
             error_msg = err.read().decode('utf-8')
             logger.error(f"api request error: {error_msg}\nurl: {url}")

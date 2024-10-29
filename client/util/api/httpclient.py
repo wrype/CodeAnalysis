@@ -43,7 +43,7 @@ class HttpRequest(object):
             request.get_method = lambda: method.upper()
             response = urlopen(request, context=ssl._create_unverified_context())
             logger.info(
-                f"wpdbg: {request.get_method()} {url} header: {request.headers} req.data: {request.data} resp: {response.read().decode("utf8")}"
+                f"wpdbg: {request.get_method()} {url} header: {request.headers} req.data: {request.data} resp: {response.read().decode('utf8')}"
             )
             return response
         except HTTPError as err:

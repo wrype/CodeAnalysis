@@ -45,7 +45,7 @@ class HttpRequest(object):
             response = urlopen(request, context=ssl._create_unverified_context())
             buffer = BytesIO(response.read())
             logger.info(
-                f"wpdbg: {request.get_method()} {url} header: {request.headers} req.data: {request.data} resp: {buffer.read().decode('utf8')}"
+                f"wpdbg: {request.get_method()} {url} header: {request.headers} req.data: {request.data.decode('utf8')} resp: {buffer.read().decode('utf8')}"
             )
             buffer.seek(0)
             return buffer

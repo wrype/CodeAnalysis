@@ -1138,7 +1138,7 @@ class ScanBranchSerializer(serializers.Serializer):
 class RepoProjectInitialValidator(object):
     def check_branch_validate(self, repo, branch):
         """检查分支是否存在"""
-        if not repo.auth_info():
+        if not repo.auth_info:
             #! 未授权不校验，只允许客户端手动扫描
             return
         if repo.scm_type == models.Repository.ScmTypeEnum.GIT:

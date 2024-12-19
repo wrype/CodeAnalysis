@@ -1,15 +1,15 @@
 /**
  * 微前端生成配置json Webpack 插件
  */
-import webpack, { Compiler, Stats, Compilation } from 'webpack';
-import chalk from 'chalk';
-import { isTrue } from './util';
-import { StrBoolean } from './type';
+import webpack, { Compiler, Stats, Compilation } from "webpack";
+import chalk from "chalk";
+import { isTrue } from "./util";
+import { StrBoolean } from "./type";
 
 const { green, yellow } = chalk.bold;
 
 /** 插件名称 */
-const PLUGIN_NAME = 'ConfigWebpackPlugin';
+const PLUGIN_NAME = "ConfigWebpackPlugin";
 /** 当前工作目录下当前package.json中的name */
 const DEFAULT_PROJECT_NAME = process.env.npm_package_name;
 /** 当前工作目录下当前package.json中的description */
@@ -29,7 +29,7 @@ const {
 } = process.env;
 
 /** 是否dev */
-const IS_DEV = NODE_ENV === 'development';
+const IS_DEV = NODE_ENV === "development";
 
 interface ConfigJson {
   /** 配置名称 */
@@ -81,7 +81,7 @@ interface Config {
   /** 匹配规则 */
   match: string | RegExp;
   /** 资源 */
-  assetKeys: Array<string>
+  assetKeys: Array<string>;
   /** 是否开启 plugin 日志，默认关闭 */
   enableLog: boolean;
 }
@@ -89,26 +89,43 @@ interface Config {
 class ConfigWebpackPlugin {
   config: Config;
   constructor(options?: ConfigWebpackPluginProps) {
-    const { enable, productName, description, commitId, match, assetKeys, enableLog } = options || {};
-    const projectName = productName || WEBPACK_CONFIG_PROJECT_NAME || DEFAULT_PROJECT_NAME || '';
-    const publicPath = PUBLIC_PATH || '/';
-    const prefix = [publicPath.endsWith('/') ? publicPath : `${publicPath}/`];
+    const {
+      enable,
+      productName,
+      description,
+      commitId,
+      match,
+      assetKeys,
+      enableLog,
+    } = options || {};
+    const projectName =
+      productName || WEBPACK_CONFIG_PROJECT_NAME || DEFAULT_PROJECT_NAME || "";
+    const publicPath = PUBLIC_PATH || "/";
+    const prefix = [publicPath.endsWith("/") ? publicPath : `${publicPath}/`];
     this.config = {
       enable: isTrue(enable || CONFIG_ENABLED || WEBPACK_CONFIG_ENABLE || true),
       productName: projectName,
-      description: description || WEBPACK_CONFIG_PROJECT_DESC || DEFAULT_PROJECT_DESC || '',
+      description:
+        description ||
+        WEBPACK_CONFIG_PROJECT_DESC ||
+        DEFAULT_PROJECT_DESC ||
+        "",
       prefix,
       publicPath,
-      commitId: commitId || GIT_REVISION || 'dirty',
-      assetKeys: assetKeys || [`runtime~${projectName}`, `vendors~${projectName}`, `${projectName}`],
-      match: match || PRODUCT_ROUTE_MATCH || WEBPACK_CONFIG_MATCH || '',
+      commitId: commitId || GIT_REVISION || "dirty",
+      assetKeys: assetKeys || [
+        `runtime~${projectName}`,
+        `vendors~${projectName}`,
+        `${projectName}`,
+      ],
+      match: match || PRODUCT_ROUTE_MATCH || WEBPACK_CONFIG_MATCH || "",
       enableLog: isTrue(enableLog || false),
     };
 
-    this.debug('配置项: ', this.config);
+    this.debug("配置项: ", this.config);
 
     if (!this.config.enable) {
-      log('插件未启用');
+      log("插件未启用");
       return;
     }
 
@@ -131,34 +148,42 @@ class ConfigWebpackPlugin {
     }
     // 将config配置资源添加到asset中
     compiler.hooks.compilation.tap(PLUGIN_NAME, (compilation) => {
-      compilation.hooks.processAssets.tap({
-        name: PLUGIN_NAME,
-        stage: Compilation.PROCESS_ASSETS_STAGE_ADDITIONS,
-      }, (assets) => {
-        const keys = Object.keys(assets);
-        if (keys.length) {
-          const config = this.generateConfig(keys);
-          const configTxt = JSON.stringify(config);
-          compilation.emitAsset(`${this.config.productName}.json`, new webpack.sources.RawSource(configTxt));
-          log(green(`[config] ${configTxt}`));
+      compilation.hooks.processAssets.tap(
+        {
+          name: PLUGIN_NAME,
+          stage: Compilation.PROCESS_ASSETS_STAGE_ADDITIONS,
+        },
+        (assets) => {
+          const keys = Object.keys(assets);
+          if (keys.length) {
+            const config = this.generateConfig(keys);
+            const configTxt = JSON.stringify(config);
+            compilation.emitAsset(
+              `${this.config.productName}.json`,
+              new webpack.sources.RawSource(configTxt)
+            );
+            log(green(`[config] ${configTxt}`));
+          }
         }
-      });
+      );
     });
 
     // 在 compilation 完成时执行，dev环境将配置地址打印出来
     compiler.hooks.done.tap(PLUGIN_NAME, ({ compilation }: Stats) => {
       // 用于dev，生成api.json url
       if (IS_DEV) {
-        const { devServer }: any = compilation.options;
+        const { devServer } = compilation.options as any;
         const https = devServer?.https || false;
-        const host = devServer?.host || 'localhost';
-        const port = devServer?.port || '8080';
+        const host = devServer?.host || "localhost";
+        const port = devServer?.port || "8080";
         const reg = new RegExp(/https?:\/\//);
         const { publicPath, productName } = this.config;
-        const prefix = reg.test(publicPath) ? publicPath : `http${https ? 's' : ''}://${host}:${port}${publicPath}`;
+        const prefix = reg.test(publicPath)
+          ? publicPath
+          : `http${https ? "s" : ""}://${host}:${port}${publicPath}`;
         const api = `${prefix}${productName}.json`;
         const timer = setTimeout(() => {
-          log(`${yellow('[dev环境]')}: API = ${green(api)}`);
+          log(`${yellow("[dev环境]")}: API = ${green(api)}`);
           clearTimeout(timer);
         }, 20);
       }
@@ -167,7 +192,8 @@ class ConfigWebpackPlugin {
 
   /** 生成cofing.json资源文件 */
   private generateConfig(assets: string[]) {
-    const { productName, publicPath, assetKeys, enable, enableLog, ...other } = this.config;
+    const { productName, publicPath, assetKeys, enable, enableLog, ...other } =
+      this.config;
     const config: ConfigJson = {
       name: productName,
       ...other,
@@ -178,9 +204,9 @@ class ConfigWebpackPlugin {
       assets.forEach((asset) => {
         if (asset.startsWith(assetKey)) {
           const file = `${publicPath}${asset}`;
-          if (asset.endsWith('.js')) {
+          if (asset.endsWith(".js")) {
             config.js.push(file);
-          } else if (asset.endsWith('.css')) {
+          } else if (asset.endsWith(".css")) {
             config.css.push(file);
           }
         }

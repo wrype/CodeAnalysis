@@ -12,15 +12,13 @@ codeproj - base serializer
 import json
 import logging
 
-# 第三方 import
-from django.conf import settings
-from django.contrib.auth.models import User
-from django.db import IntegrityError, transaction
-from rest_framework import exceptions, serializers
-
 # 项目内 import
-from apps.authen.serializers.base import CodedogUserInfoSerializer, ScmAuthCreateSerializer, ScmAuthSerializer
-from apps.authen.serializers.base import UserSimpleSerializer
+from apps.authen.serializers.base import (
+    CodedogUserInfoSerializer,
+    ScmAuthCreateSerializer,
+    ScmAuthSerializer,
+    UserSimpleSerializer,
+)
 from apps.authen.serializers.base_org import OrganizationSimpleSerializer
 from apps.base.serializers import CDBaseModelSerializer
 from apps.codeproj import core, models
@@ -28,6 +26,12 @@ from apps.codeproj.core import LabelManager, ProjectTeamManager
 from apps.job import models as job_models
 from apps.nodemgr.models import ExecTag, Node
 from apps.scan_conf.models import CheckRule, CheckTool, Label, PackageMap
+
+# 第三方 import
+from django.conf import settings
+from django.contrib.auth.models import User
+from django.db import IntegrityError, transaction
+from rest_framework import exceptions, serializers
 from util import scm
 from util.cdcrypto import encrypt
 from util.operationrecord import OperationRecordHandler
@@ -1131,7 +1135,34 @@ class ScanBranchSerializer(serializers.Serializer):
         return schemes
 
 
-class RepoProjectInitialSerializer(serializers.Serializer):
+class RepoProjectInitialValidator(object):
+    def check_branch_validate(self, repo, branch):
+        """检查分支是否存在"""
+        if not repo.auth_info():
+            #! 未授权不校验，只允许客户端手动扫描
+            return
+        if repo.scm_type == models.Repository.ScmTypeEnum.GIT:
+            scm_url = "%s#%s" % (repo.get_scm_url_with_auth(), branch)
+        else:
+            scm_url = "%s/%s" % (repo.get_scm_url_with_auth(), branch)
+        logger.info("check branch validate: %s" % scm_url)
+        scm_client = core.ScmClientManager.get_scm_client_with_repo(
+            repo, scm_url=scm_url
+        )
+        try:
+            scm_client.branch_check()
+        except scm.ScmNotFoundError:
+            raise serializers.ValidationError({"cd_error": "代码库分支不存在"})
+        except scm.ScmAccessDeniedError:
+            raise serializers.ValidationError({"cd_error": "代码库帐号无权限"})
+        except scm.ScmClientError:
+            raise serializers.ValidationError({"cd_error": "代码库密码错误"})
+        except Exception as e:
+            logger.exception("check branch validate exception: %s" % e)
+            raise serializers.ValidationError({"cd_error": "代码库及帐号不匹配"})
+
+
+class RepoProjectInitialSerializer(serializers.Serializer, RepoProjectInitialValidator):
     """项目初始化序列化，用于首次创建项目
     """
     id = serializers.ReadOnlyField()
@@ -1168,27 +1199,6 @@ class RepoProjectInitialSerializer(serializers.Serializer):
         if not scan_scheme and not global_scheme_id:
             raise exceptions.ValidationError({"cd_error": "需填写初始化方案参数或方案模板编号"})
         return attrs
-
-    def check_branch_validate(self, repo, branch):
-        """检查分支是否存在
-        """
-        if repo.scm_type == models.Repository.ScmTypeEnum.GIT:
-            scm_url = "%s#%s" % (repo.get_scm_url_with_auth(), branch)
-        else:
-            scm_url = "%s/%s" % (repo.get_scm_url_with_auth(), branch)
-        logger.info("check branch validate: %s" % scm_url)
-        scm_client = core.ScmClientManager.get_scm_client_with_repo(repo, scm_url=scm_url)
-        try:
-            scm_client.branch_check()
-        except scm.ScmNotFoundError:
-            raise serializers.ValidationError("代码库分支不存在")
-        except scm.ScmAccessDeniedError:
-            raise serializers.ValidationError("代码库帐号无权限")
-        except scm.ScmClientError:
-            raise serializers.ValidationError("代码库密码错误")
-        except Exception as e:
-            logger.exception("check branch validate exception: %s" % e)
-            raise serializers.ValidationError("代码库及帐号不匹配")
 
     def create(self, validated_data):
         """创建扫描方案、分支
@@ -1260,7 +1270,7 @@ class ProjectSimpleSerializer(CDBaseModelSerializer):
         return "%s/repos/%s/projects/%s" % (settings.LOCAL_DOMAIN, project.repo_id, project.id)
 
 
-class ProjectSerializer(CDBaseModelSerializer):
+class ProjectSerializer(CDBaseModelSerializer, RepoProjectInitialValidator):
     """扫描项目序列化
     """
     scan_path = serializers.CharField(max_length=512, help_text="扫描路径",
@@ -1305,27 +1315,6 @@ class ProjectSerializer(CDBaseModelSerializer):
             raise exceptions.NotFound({"cd_error": "方案模板不存在"})
         else:
             return global_scheme
-
-    def check_branch_validate(self, repo, branch):
-        """检查分支是否存在
-        """
-        if repo.scm_type == models.Repository.ScmTypeEnum.GIT:
-            scm_url = "%s#%s" % (repo.get_scm_url_with_auth(), branch)
-        else:
-            scm_url = "%s/%s" % (repo.get_scm_url_with_auth(), branch)
-        logger.info("check branch validate: %s" % scm_url)
-        scm_client = core.ScmClientManager.get_scm_client_with_repo(repo, scm_url=scm_url)
-        try:
-            scm_client.branch_check()
-        except scm.ScmNotFoundError:
-            raise serializers.ValidationError({"cd_error": "代码库分支不存在"})
-        except scm.ScmAccessDeniedError:
-            raise serializers.ValidationError({"cd_error": "代码库帐号无权限"})
-        except scm.ScmClientError:
-            raise serializers.ValidationError({"cd_error": "代码库密码错误"})
-        except Exception as e:
-            logger.exception("check branch validate exception: %s" % e)
-            raise serializers.ValidationError({"cd_error": "代码库及帐号不匹配"})
 
     def validate(self, attrs):
         """请求参数校验

@@ -43,10 +43,30 @@ jobs:
     - name: Check Out 
       uses: actions/checkout@v2
 
+    # 获取短提交 ID
     - name: Get short commit ID
       id: get_commit_id
       run: |
         echo "short_commit_id=${GITHUB_SHA:0:10}" >> $GITHUB_ENV
+
+    # 设置 Python 环境和缓存 pip
+    - name: Set up Python and Cache Dependencies
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.7'
+
+    - name: Cache pip
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install Dependencies
+      run: |
+        pip install --upgrade pip
+        pip install -r ./server/projects/main/requirements.txt
 
     # 2. 登陆
     - name: Login to Docker Hub

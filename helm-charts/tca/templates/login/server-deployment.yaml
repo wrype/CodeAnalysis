@@ -62,7 +62,11 @@ spec:
 {{ toYaml .Values.tca.login.server.resources | indent 12 }}
 ---
 {{- if .Values.tca.login.server.autoscaling.enabled }}
+{{- if semverCompare "<1.23.0" .Capabilities.KubeVersion.Version -}}
 apiVersion: autoscaling/v2beta2
+{{- else -}}
+apiVersion: autoscaling/v2
+{{- end }}
 kind: HorizontalPodAutoscaler
 metadata:
   name: {{ template "tca.fullname" . }}-login-server

@@ -81,7 +81,11 @@ spec:
 {{ toYaml .Values.tca.main.resources | indent 12 }}
 ---
 {{- if .Values.tca.main.server.autoscaling }}
+{{- if semverCompare "<1.23.0" .Capabilities.KubeVersion.Version -}}
 apiVersion: autoscaling/v2beta2
+{{- else -}}
+apiVersion: autoscaling/v2
+{{- end }}
 kind: HorizontalPodAutoscaler
 metadata:
   name: {{ template "tca.fullname" . }}-main-server

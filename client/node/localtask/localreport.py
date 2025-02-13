@@ -11,10 +11,10 @@ localscan 结果报告处理类
 
 import json
 
-from node.localtask.urlmgr import UrlMgr
 from node.localtask.status import StatusType
-from util.logutil import LogPrinter
+from node.localtask.urlmgr import UrlMgr
 from util.errcode import OK
+from util.logutil import LogPrinter
 
 
 class LocalReport(object):
@@ -63,7 +63,7 @@ class LocalReport(object):
             "current_scan": {  # 本次扫描
                 "issue_open_num": 0,    # 新增问题量
                 "issue_fix_num": 0,     # 关闭问题量
-                "active_severity_detail":{  #新增问题严重级别统计
+                "active_severity_detail":{  # 新增问题严重级别统计
                     "fatal": 0,   # 致命
                     "error": 0,   # 错误
                     "warning": 0, # 警告

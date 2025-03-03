@@ -133,7 +133,7 @@ class ThreadRunner(object):
         tool_name_list = [info["tool_dirname"] for info in tool_lists]
         tools_count = len(tool_name_list)
         # LogPrinter.info("Initialize tools: %s" % ", ".join(tool_name_list))
-        LogPrinter.info(f"Initing {tools_count} tools, please wait a minute ...")
+        LogPrinter.info(f"Initing {tools_count} tools({", ".join(tool_name_list)}), please wait a minute ...")
 
         self._process_bar = tqdm(total=tools_count, desc="[Tools init]", ncols=100)
 

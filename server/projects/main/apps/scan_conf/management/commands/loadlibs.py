@@ -70,15 +70,6 @@ class Command(BaseCommand):
             created = True
         return scm_account, created
 
-    def load_lib_json(self, lib_name, dirname):
-        """加载单个工具依赖的JSON文件"""
-        file_path = os.path.join(SCAN_CONF_COMMANDS_PATH, dirname, "%s.json" % lib_name)
-        with open(file_path, "r") as fd:
-            toollib_json = json.load(fd)
-        if isinstance(toollib_json, list) and len(toollib_json) > 0:
-            toollib_json = toollib_json[0]
-        return toollib_json
-
     def handle(self, *args, **options):
         ignore_auth = options.get("ignore_auth")
         account = options.get("account")
@@ -105,7 +96,14 @@ class Command(BaseCommand):
         failed_names = []
         for lib_name in lib_name_list:
             try:
-                toollib_json = self.load_lib_json(lib_name, dirname)
+                file_path = os.path.join(
+                    SCAN_CONF_COMMANDS_PATH, dirname, "%s.json" % lib_name
+                )
+                with open(file_path, "r") as fd:
+                    toollib_json = json.load(fd)
+                # 如果是json数组则只取第一项
+                if isinstance(toollib_json, list) and len(toollib_json) > 0:
+                    toollib_json = toollib_json[0]
                 if ignore_auth is not True:
                     # 存在非link类型的依赖，则需要凭证
                     if (

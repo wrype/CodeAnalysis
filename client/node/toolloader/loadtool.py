@@ -13,16 +13,15 @@
 import os
 import time
 
-from tqdm import tqdm
-
 from node.app import settings
 from node.toolloader.gitload import GitLoader
-from node.toolloader.loadconfig import ConfigLoader, ToolConfig, LoadToolTypes
 from node.toolloader.httploadtool import HttpToolLoader
+from node.toolloader.loadconfig import ConfigLoader, LoadToolTypes, ToolConfig
+from tqdm import tqdm
 from util.envset import EnvSet
-from util.scanlang.callback_queue import CallbackQueue
-from util.pathlib import PathMgr
 from util.logutil import LogPrinter
+from util.pathlib import PathMgr
+from util.scanlang.callback_queue import CallbackQueue
 from util.scmurlmgr import BaseScmUrlMgr
 from util.subprocc import SubProcController
 from util.textutil import ZIP_EXT
@@ -133,7 +132,7 @@ class ThreadRunner(object):
         tool_name_list = [info["tool_dirname"] for info in tool_lists]
         tools_count = len(tool_name_list)
         # LogPrinter.info("Initialize tools: %s" % ", ".join(tool_name_list))
-        LogPrinter.info(f"Initing {tools_count} tools({", ".join(tool_name_list)}), please wait a minute ...")
+        LogPrinter.info(f"Initing {tools_count} tools({', '.join(tool_name_list)}), please wait a minute ...")
 
         self._process_bar = tqdm(total=tools_count, desc="[Tools init]", ncols=100)
 
